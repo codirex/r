@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Swipe DOWN from idle dismisses the player (YouTube style). -->
+    <Transition
+        android:id="@+id/toDismissed"
+        app:constraintSetEnd="@id/setDismissed"
+        app:constraintSetStart="@id/setIdle"
+        app:duration="250"
+        app:motionInterpolator="easeOut">
+        <OnSwipe
+            app:dragDirection="dragUp"
+            app:touchAnchorId="@id/motionRoot"
+            app:touchAnchorSide="bottom"
+            app:touchRegionId="@id/motionRoot" />
+    </Transition>
+
+    <!-- Drag UP from idle reveals the lyrics panel. -->
+    <Transition
+        android:id="@+id/toLyrics"
+        app:constraintSetEnd="@id/setLyrics"
+        app:constraintSetStart="@id/setIdle"
+        app:duration="300"
+        app:motionInterpolator="easeOut">
+        <OnSwipe
+            app:dragDirection="dragDown"
+            app:touchAnchorId="@id/lyricsPanel"
+            app:touchAnchorSide="bottom"
+            app:touchRegionId="@id/lyricsPanel" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/setIdle">
+        <Constraint
+            android:id="@+id/lyricsPanel"
+            app:layout_constraintHeight_percent="0.85"
+            app:layout_constraintTop_bias="1.0" />
+        <Constraint
+            android:id="@+id/motionRoot"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:alpha="1" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/setLyrics">
+        <Constraint
+            android:id="@+id/lyricsPanel"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.85"
+            app:layout_constraintTop_bias="0.0"
+            app:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/setDismissed">
+        <Constraint
+            android:id="@+id/motionRoot"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:alpha="0"
+            app:layout_constraintHeight_percent="1"
+            app:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+
+</MotionScene>

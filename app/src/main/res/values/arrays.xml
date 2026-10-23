@@ -1,0 +1,34 @@
+<resources>
+    <string-array name="player_type_entries">
+        <item>Custom</item>
+        <item>System</item>
+    </string-array>
+    <string-array name="player_type_values">
+        <item>custom</item>
+        <item>system</item>
+    </string-array>
+
+    <string-array name="repeat_entries">
+        <item>Off</item>
+        <item>All</item>
+        <item>One</item>
+    </string-array>
+    <string-array name="repeat_values">
+        <item>off</item>
+        <item>all</item>
+        <item>one</item>
+    </string-array>
+
+    <string-array name="grid_columns_entries">
+        <item>Automatic</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="grid_columns_values">
+        <item>auto</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Exported snapshots, ringtone copies and playlists images -->
+    <cache-path name="snapshots" path="snapshots/" />
+    <files-path name="playlist_covers" path="playlist_covers/" />
+    <external-path name="external" path="." />
+</paths>

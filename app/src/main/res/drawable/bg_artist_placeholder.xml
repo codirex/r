@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Layer-list placeholder used when an artist (or album) has no custom image.
+  The background layer is semi-transparent so it adapts to the active theme,
+  and the icon layer sits centered on top.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Semi-transparent background, theme adaptive -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#33FFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <stroke
+                android:width="1.5dp"
+                android:color="#59FFFFFF" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- Person icon -->
+    <item
+        android:drawable="@drawable/ic_artist"
+        android:gravity="center"
+        android:width="44dp"
+        android:height="44dp" />
+</layer-list>

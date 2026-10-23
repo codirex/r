@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/pref_category_player">
+
+        <!-- Player type: custom designed notification or system-styled -->
+        <ListPreference
+            android:key="player_type"
+            android:title="@string/pref_player_type"
+            android:summary="@string/pref_player_type_summary"
+            android:entries="@array/player_type_entries"
+            android:entryValues="@array/player_type_values"
+            android:defaultValue="custom"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="player_keep_playing"
+            android:title="@string/pref_keep_playing"
+            android:summary="@string/pref_keep_playing_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="player_resume_on_boot"
+            android:title="@string/pref_resume_on_boot"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="player_pause_on_call"
+            android:title="@string/pref_pause_on_call"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="player_default_repeat"
+            android:title="@string/pref_default_repeat"
+            android:entries="@array/repeat_entries"
+            android:entryValues="@array/repeat_values"
+            android:defaultValue="off"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="player_default_shuffle"
+            android:title="@string/pref_default_shuffle"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="player_long_seek_buttons"
+            android:title="@string/pref_long_seek_buttons"
+            android:summary="@string/pref_long_seek_buttons_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_library">
+
+        <SwitchPreferenceCompat
+            android:key="library_auto_sync"
+            android:title="@string/pref_auto_sync"
+            android:summary="@string/pref_auto_sync_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="library_ignore_short"
+            android:title="@string/pref_ignore_short"
+            android:summary="@string/pref_ignore_short_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="library_rescan"
+            android:title="@string/pref_rescan"
+            android:summary="@string/pref_rescan_summary"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_appearance">
+
+        <SwitchPreferenceCompat
+            android:key="appearance_palette"
+            android:title="@string/pref_palette"
+            android:summary="@string/pref_palette_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="appearance_waves"
+            android:title="@string/pref_waves"
+            android:summary="@string/pref_waves_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="appearance_grid_columns"
+            android:title="@string/pref_grid_columns"
+            android:entries="@array/grid_columns_entries"
+            android:entryValues="@array/grid_columns_values"
+            android:defaultValue="auto"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="appearance_animate_click"
+            android:title="@string/pref_animate_click"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_notifications">
+
+        <SwitchPreferenceCompat
+            android:key="notif_show_artwork"
+            android:title="@string/pref_show_artwork"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="notif_show_next_prev"
+            android:title="@string/pref_show_next_prev"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="notif_hide_when_paused"
+            android:title="@string/pref_hide_when_paused"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_integrations">
+
+        <SwitchPreferenceCompat
+            android:key="integration_qs_tile"
+            android:title="@string/pref_qs_tile"
+            android:summary="@string/pref_qs_tile_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="integration_widget"
+            android:title="@string/pref_widget"
+            android:summary="@string/pref_widget_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_lyrics">
+
+        <SwitchPreferenceCompat
+            android:key="lyrics_live_highlight"
+            android:title="@string/pref_live_highlight"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="lyrics_auto_fetch"
+            android:title="@string/pref_lyrics_fetch"
+            android:summary="@string/pref_lyrics_fetch_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

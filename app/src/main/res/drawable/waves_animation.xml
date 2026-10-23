@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Animated waves shown in the row of the currently playing track.
+     Each frame is a small bar chart at different heights. -->
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+
+    <item android:duration="180">
+        <layer-list>
+            <item android:width="3dp" android:height="8dp" android:gravity="center_vertical|left">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="16dp" android:gravity="center_vertical|center_horizontal">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="10dp" android:gravity="center_vertical|right">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <item android:duration="180">
+        <layer-list>
+            <item android:width="3dp" android:height="16dp" android:gravity="center_vertical|left">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="8dp" android:gravity="center_vertical|center_horizontal">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="18dp" android:gravity="center_vertical|right">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <item android:duration="180">
+        <layer-list>
+            <item android:width="3dp" android:height="12dp" android:gravity="center_vertical|left">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="20dp" android:gravity="center_vertical|center_horizontal">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="8dp" android:gravity="center_vertical|right">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <item android:duration="180">
+        <layer-list>
+            <item android:width="3dp" android:height="20dp" android:gravity="center_vertical|left">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="10dp" android:gravity="center_vertical|center_horizontal">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+            <item android:width="3dp" android:height="14dp" android:gravity="center_vertical|right">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/wave_active" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+</animation-list>

@@ -1,0 +1,94 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.dagger.hilt.android'
+}
+
+android {
+    namespace 'com.musicplayer.app'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId "com.musicplayer.app"
+        minSdk 24
+        targetSdk 37
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+    }
+}
+
+dependencies {
+    // AndroidX Core
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.transition:transition:1.5.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+    
+    // Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.9.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.9.0'
+    
+    // Navigation
+    implementation 'androidx.navigation:navigation-fragment:2.10.2'
+    implementation 'androidx.navigation:navigation-ui:2.10.2'
+    
+    // Preferences
+    implementation 'androidx.preference:preference:1.2.1'
+    
+    // Room
+    implementation 'androidx.room:room-runtime:2.8.5'
+    implementation 'androidx.room:room-paging:2.8.5'
+    annotationProcessor 'androidx.room:room-compiler:2.8.5'
+    
+    // Paging
+    implementation 'androidx.paging:paging-runtime:3.5.3'
+    
+    // WorkManager
+    implementation 'androidx.work:work-runtime:2.12.0'
+    
+    // MotionLayout ships inside constraintlayout (since 2.0)
+    // Media3
+    implementation 'androidx.media3:media3-exoplayer:1.11.1'
+    implementation 'androidx.media3:media3-session:1.11.1'
+    
+    // ShareTarget
+    implementation 'androidx.sharetarget:sharetarget:1.2.0'
+    
+    // Palette
+    implementation 'androidx.palette:palette:1.0.0'
+    
+    // Hilt
+    implementation 'com.google.dagger:hilt-android:2.60.1'
+    annotationProcessor 'com.google.dagger:hilt-compiler:2.60.1'
+    
+    // Material
+    implementation 'com.google.android.material:material:1.14.0'
+    
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:5.0.9'
+    annotationProcessor 'com.github.bumptech.glide:compiler:5.0.9'
+}

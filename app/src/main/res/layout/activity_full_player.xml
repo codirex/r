@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/motionRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_full_player"
+    app:layoutDescription="@xml/scene_full_player">
+
+    <!-- Album artwork: 75% of screen width, starts at the top edge, centered
+         horizontally, ~65% of screen height, bottom corners rounded 50%. -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivArtwork"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_album_placeholder_large"
+        app:layout_constraintDimensionRatio="W,1.15"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.75"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.FullPlayer.Artwork"
+        tools:ignore="MissingConstraints" />
+
+    <!-- Gradient scrim so overlaid text stays readable -->
+    <View
+        android:id="@+id/scrim"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:background="@drawable/bg_title_scrim"
+        app:layout_constraintBottom_toBottomOf="@id/ivArtwork"
+        app:layout_constraintEnd_toEndOf="@id/ivArtwork"
+        app:layout_constraintStart_toStartOf="@id/ivArtwork" />
+
+    <!-- Back / collapse -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/back"
+        app:icon="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Title block floating over the lower part of the artwork (z-offset above image) -->
+    <LinearLayout
+        android:id="@+id/titleBlock"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/arcSlider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:paddingHorizontal="32dp"
+            android:singleLine="true"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="Track title" />
+
+        <TextView
+            android:id="@+id/tvAlbum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="32dp"
+            android:textSize="15sp"
+            tools:text="Album name" />
+
+        <TextView
+            android:id="@+id/tvArtist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="32dp"
+            android:textSize="15sp"
+            tools:text="Artist name" />
+    </LinearLayout>
+
+    <!-- Inverted-arc slider with counters at both upper ends -->
+    <com.musicplayer.app.ui.player.ArcSliderView
+        android:id="@+id/arcSlider"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivArtwork"
+        app:layout_constraintWidth_percent="0.92" />
+
+    <!-- Controls: shuffle, previous, -10s, play/pause, +10s, next, repeat (left to right) -->
+    <LinearLayout
+        android:id="@+id/controlRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/arcSlider">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnShuffle"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="@string/shuffle"
+            app:icon="@drawable/ic_shuffle"
+            app:iconSize="22dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrevious"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/previous"
+            app:icon="@drawable/ic_previous"
+            app:iconSize="26dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBackward"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/back_10"
+            android:visibility="gone"
+            app:icon="@drawable/ic_replay_10"
+            app:iconSize="26dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPlayPause"
+            style="@style/Widget.Material3.Button.IconButton.Filled"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginHorizontal="8dp"
+            android:contentDescription="@string/play_pause"
+            app:icon="@drawable/selector_play_pause"
+            app:iconSize="34dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnForward"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/forward_10"
+            android:visibility="gone"
+            app:icon="@drawable/ic_forward_10"
+            app:iconSize="26dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNext"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/next"
+            app:icon="@drawable/ic_next"
+            app:iconSize="26dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRepeat"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:contentDescription="@string/repeat"
+            app:icon="@drawable/ic_repeat"
+            app:iconSize="22dp" />
+    </LinearLayout>
+
+    <!-- Secondary row: queue, lyrics, equalizer, sleep timer, favorite, share -->
+    <LinearLayout
+        android:id="@+id/secondaryRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/controlRow">
+
+        <ImageButton
+            android:id="@+id/btnFavorite"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/favorite"
+            app:srcCompat="@drawable/ic_favorite_border" />
+
+        <ImageButton
+            android:id="@+id/btnSleepTimer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/sleep_timer"
+            app:srcCompat="@drawable/ic_sleep" />
+
+        <ImageButton
+            android:id="@+id/btnLyrics"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lyrics"
+            app:srcCompat="@drawable/ic_lyrics" />
+
+        <ImageButton
+            android:id="@+id/btnEqualizer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/equalizer"
+            app:srcCompat="@drawable/ic_equalizer" />
+
+        <ImageButton
+            android:id="@+id/btnQueue"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/queue"
+            app:srcCompat="@drawable/ic_queue" />
+    </LinearLayout>
+
+    <!-- Lyrics panel: dragged up from inside the full player (MotionLayout) -->
+    <FrameLayout
+        android:id="@+id/lyricsPanel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_lyrics_panel"
+        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHeight_percent="0.85">
+
+        <com.musicplayer.app.ui.player.LyricsView
+            android:id="@+id/lyricsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="24dp" />
+
+        <ImageButton
+            android:id="@+id/btnCloseLyrics"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end|top"
+            android:layout_margin="8dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/close"
+            app:srcCompat="@drawable/ic_close" />
+    </FrameLayout>
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

@@ -1,0 +1,143 @@
+<resources>
+    <string name="app_name">Music Player</string>
+
+    <!-- Notification -->
+    <string name="notif_channel_name">Playback</string>
+    <string name="play_pause">Play / Pause</string>
+
+    <!-- Player controls -->
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="repeat">Repeat</string>
+    <string name="back_10">Back 10 seconds</string>
+    <string name="forward_10">Forward 10 seconds</string>
+    <string name="favorite">Favourite</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="queue">Queue</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="no_lyrics">No lyrics for this track</string>
+    <string name="required">Required</string>
+
+    <!-- Tabs -->
+    <string name="tab_tracks">Tracks</string>
+    <string name="tab_albums">Albums</string>
+    <string name="tab_artists">Artists</string>
+    <string name="tab_genres">Genres</string>
+    <string name="tab_playlists">Playlists</string>
+
+    <!-- Main menu -->
+    <string name="search_hint">Search songs, albums, artists…</string>
+    <string name="sort">Sort</string>
+    <string name="settings">Settings</string>
+
+    <!-- Shutdown dialog -->
+    <string name="shutdown_title">Stop playback after</string>
+    <string name="shutdown_after_tracks">Stop after N tracks</string>
+    <string name="shutdown_after_time">Stop after N minutes</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Sort dialog -->
+    <string name="sort_title">Sort by</string>
+    <string name="sort_descending">Descending</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_artist">Artist</string>
+    <string name="sort_album">Album</string>
+    <string name="sort_duration">Duration</string>
+    <string name="sort_recent">Recently added</string>
+    <string name="sort_played">Most played</string>
+    <string name="sort_year">Year</string>
+    <string name="sort_tracks">Number of tracks</string>
+    <string name="sort_created">Recently created</string>
+
+    <!-- Track details sheet -->
+    <string name="details_album">Album</string>
+    <string name="details_date">Date</string>
+    <string name="details_size">Size</string>
+    <string name="details_plays">Plays</string>
+    <string name="details_duration">Duration</string>
+    <string name="details_avg_listen">Average listening</string>
+    <string name="action_play_after_current">Play after current song</string>
+    <string name="action_add_to_queue">Add to queue</string>
+    <string name="action_add_to_playlist">Add to playlist</string>
+    <string name="action_stop_after">Stop after this song</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_snapshot">Snapshot &amp; export</string>
+    <string name="action_ringtone">Set as ringtone</string>
+    <string name="action_share">Share</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_select">Select</string>
+
+    <!-- Edit track -->
+    <string name="edit_track_title">Edit track</string>
+    <string name="edit_title">Title</string>
+    <string name="edit_artist">Artist</string>
+    <string name="edit_album">Album</string>
+    <string name="edit_genre">Genre</string>
+    <string name="edit_year">Year</string>
+    <string name="pick_image">Pick image</string>
+    <string name="save">Save</string>
+
+    <!-- Playlists -->
+    <string name="create_playlist">Create playlist</string>
+    <string name="edit_playlist">Edit playlist</string>
+    <string name="playlist_name">Playlist name</string>
+    <string name="mood">Mood</string>
+    <string name="mood_happy">Happy</string>
+    <string name="mood_chill">Chill</string>
+    <string name="mood_sad">Sad</string>
+    <string name="mood_energetic">Energetic</string>
+    <string name="mood_focus">Focus</string>
+    <string name="mood_romantic">Romantic</string>
+
+    <!-- Settings categories -->
+    <string name="pref_category_player">Player</string>
+    <string name="pref_player_type">Player type</string>
+    <string name="pref_player_type_summary">Custom designed or system-styled player &amp; notification</string>
+    <string name="pref_keep_playing">Keep playing in background</string>
+    <string name="pref_keep_playing_summary">Playback continues when the app is closed or swiped away</string>
+    <string name="pref_resume_on_boot">Resume after device restart</string>
+    <string name="pref_pause_on_call">Pause on incoming call</string>
+    <string name="pref_default_repeat">Default repeat mode</string>
+    <string name="pref_default_shuffle">Start with shuffle enabled</string>
+    <string name="pref_long_seek_buttons">Show +10s / −10s for long tracks</string>
+    <string name="pref_long_seek_buttons_summary">Skip buttons appear only when a track is longer than 5 minutes</string>
+
+    <string name="pref_category_library">Library</string>
+    <string name="pref_auto_sync">Automatic library sync</string>
+    <string name="pref_auto_sync_summary">Detect downloads, edits, deletions and tag changes in the background</string>
+    <string name="pref_ignore_short">Ignore short audio files</string>
+    <string name="pref_ignore_short_summary">Skip files shorter than 10 seconds</string>
+    <string name="pref_rescan">Rescan library</string>
+    <string name="pref_rescan_summary">Import all audio from MediaStore again</string>
+
+    <string name="pref_category_appearance">Appearance</string>
+    <string name="pref_palette">Theme from artwork colours</string>
+    <string name="pref_palette_summary">Use androidx.palette colours from the playing track, with a default theme as fallback</string>
+    <string name="pref_waves">Animated waves on playing track</string>
+    <string name="pref_waves_summary">The playing row shows animated waves reacting to playback</string>
+    <string name="pref_grid_columns">Grid columns</string>
+    <string name="pref_animate_click">Press animations</string>
+
+    <string name="pref_category_notifications">Notification player</string>
+    <string name="pref_show_artwork">Show artwork</string>
+    <string name="pref_show_next_prev">Show next / previous buttons</string>
+    <string name="pref_hide_when_paused">Hide notification when paused</string>
+
+    <string name="pref_category_integrations">System integration</string>
+    <string name="pref_qs_tile">Quick settings tile</string>
+    <string name="pref_qs_tile_summary">Add a playback tile next to Wi‑Fi, Bluetooth and Airplane mode</string>
+    <string name="pref_widget">Launcher widget</string>
+    <string name="pref_widget_summary">Keep a player widget on the home screen</string>
+
+    <string name="pref_category_lyrics">Lyrics</string>
+    <string name="pref_live_highlight">Live highlighting</string>
+    <string name="pref_lyrics_fetch">Fetch lyrics automatically</string>
+    <string name="pref_lyrics_fetch_summary">Look for .lrc files next to the track</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Large artwork placeholder used by the player while artwork loads or is missing. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#4A3F5B"
+                android:centerColor="#2E3A52"
+                android:endColor="#1D2637" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_music_note"
+        android:gravity="center"
+        android:width="72dp"
+        android:height="72dp" />
+</layer-list>
