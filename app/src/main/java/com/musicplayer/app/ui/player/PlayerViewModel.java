@@ -23,8 +23,25 @@ public class PlayerViewModel extends ViewModel {
     private final PlaybackController controller;
     private final MusicRepository repository;
 
+    /**
+     * Sort choice shared by every tab: the sort dialog writes it once and each
+     * fragment applies it to its own content type.
+     */
+    public static final class SortSpec {
+        public final String key;
+        public final boolean descending;
+
+        public SortSpec(String key, boolean descending) {
+            this.key = key == null ? "name" : key;
+            this.descending = descending;
+        }
+    }
+
     private final MutableLiveData<Integer> stopAfterDialogState = new MutableLiveData<>();
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>("");
+    private final MutableLiveData<SortSpec> sortSpec =
+            new MutableLiveData<>(new SortSpec("name", false));
+    private final MutableLiveData<Song> selectRequest = new MutableLiveData<>();
 
     @Inject
     public PlayerViewModel(PlaybackController controller, MusicRepository repository) {
@@ -112,6 +129,36 @@ public class PlayerViewModel extends ViewModel {
 
     public void setSearchQuery(String query) {
         searchQuery.setValue(query == null ? "" : query);
+    }
+
+    /**
+     * One-shot request from the track details sheet: the Tracks tab reacts by
+     * entering selection mode with the requested song pre-checked.
+     */
+    public LiveData<Song> getSelectRequest() {
+        return selectRequest;
+    }
+
+    public void requestSelect(Song song) {
+        selectRequest.setValue(song);
+    }
+
+    public void clearSelectRequest() {
+        selectRequest.setValue(null);
+    }
+
+    /** Shared sort choice: every tab observes and re-orders by it. */
+    public LiveData<SortSpec> getSortSpec() {
+        return sortSpec;
+    }
+
+    public void setSortSpec(String key, boolean descending) {
+        SortSpec current = sortSpec.getValue();
+        if (current != null && current.key.equals(key == null ? "name" : key)
+                && current.descending == descending) {
+            return;
+        }
+        sortSpec.setValue(new SortSpec(key, descending));
     }
 
     /** True when [value] matches [query] (case-insensitive, empty query matches all). */

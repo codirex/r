@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +17,7 @@ import androidx.fragment.app.DialogFragment;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.musicplayer.app.R;
 import com.musicplayer.app.data.model.Playlist;
 import com.musicplayer.app.data.repository.MusicRepository;
@@ -32,12 +35,14 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class CreatePlaylistDialogFragment extends DialogFragment {
 
     public static final String ARG_EDIT_PLAYLIST = "edit_playlist";
+    public static final String ARG_PICK_EXISTING = "pick_existing";
 
     @Inject
     MusicRepository repository;
 
     private String coverUri;
     private Playlist editing;
+    private Playlist selectedExistingPlaylist;
 
     public interface OnPlaylistCreated {
         void onPlaylistCreated(Playlist playlist);
@@ -45,6 +50,15 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
 
     public static CreatePlaylistDialogFragment newInstance() {
         return new CreatePlaylistDialogFragment();
+    }
+
+    /** Opened from "Add to playlist": also lists the existing playlists to pick from. */
+    public static CreatePlaylistDialogFragment newInstanceForPick() {
+        CreatePlaylistDialogFragment fragment = new CreatePlaylistDialogFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_PICK_EXISTING, true);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public static CreatePlaylistDialogFragment forEdit(Playlist playlist) {
@@ -85,7 +99,20 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
 
         btnPickImage.setOnClickListener(v -> pickImage.launch("image/*"));
 
+        // "Add to playlist" mode: offer the existing playlists alongside creating one.
+        if (editing == null && getArguments() != null
+                && getArguments().getBoolean(ARG_PICK_EXISTING, false)) {
+            setupExistingPlaylists(view);
+        }
+
         btnSave.setOnClickListener(v -> {
+            // Picking an existing playlist adds the track straight to it.
+            if (editing == null && selectedExistingPlaylist != null) {
+                notifyResult(selectedExistingPlaylist);
+                dismiss();
+                return;
+            }
+
             String name = etName.getText().toString().trim();
             if (name.isEmpty()) {
                 etName.setError(getString(R.string.required));
@@ -115,6 +142,35 @@ public class CreatePlaylistDialogFragment extends DialogFragment {
         });
 
         btnCancel.setOnClickListener(v -> dismiss());
+    }
+
+    /** Fills the "existing playlists" radio list when opened for "Add to playlist". */
+    private void setupExistingPlaylists(View root) {
+        final TextView label = root.findViewById(R.id.labelExisting);
+        final RadioGroup group = root.findViewById(R.id.radioExistingPlaylists);
+
+        repository.playlists().getUserPlaylists().observe(getViewLifecycleOwner(), list -> {
+            if (!isAdded()) return;
+            group.removeAllViews();
+            selectedExistingPlaylist = null;
+
+            boolean any = list != null && !list.isEmpty();
+            label.setVisibility(any ? View.VISIBLE : View.GONE);
+            group.setVisibility(any ? View.VISIBLE : View.GONE);
+            if (!any) return;
+
+            for (Playlist playlist : list) {
+                MaterialRadioButton radio = new MaterialRadioButton(requireContext());
+                radio.setText(playlist.getName());
+                radio.setTag(playlist);
+                group.addView(radio);
+            }
+            group.setOnCheckedChangeListener((radioGroup, checkedId) -> {
+                View checked = radioGroup.findViewById(checkedId);
+                selectedExistingPlaylist = checked != null && checked.getTag() instanceof Playlist
+                        ? (Playlist) checked.getTag() : null;
+            });
+        });
     }
 
     private void notifyResult(Playlist playlist) {

@@ -79,6 +79,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Shown only in selection mode, overlaid on the artwork. -->
+        <CheckBox
+            android:id="@+id/checkSelected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#FFFFFFFF"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ivAlbumArt"
+            app:layout_constraintEnd_toEndOf="@id/ivAlbumArt"
+            app:layout_constraintStart_toStartOf="@id/ivAlbumArt"
+            app:layout_constraintTop_toTopOf="@id/ivAlbumArt" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

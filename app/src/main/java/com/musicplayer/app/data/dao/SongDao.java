@@ -35,8 +35,16 @@ public interface SongDao {
     @Query("SELECT * FROM songs WHERE isFavorite = 1 ORDER BY title ASC")
     LiveData<List<Song>> getFavoriteSongs();
 
+    /** Synchronous twin used when starting playback off the main thread. */
+    @Query("SELECT * FROM songs WHERE isFavorite = 1 ORDER BY title ASC")
+    List<Song> getFavoriteSongsSync();
+
     @Query("SELECT * FROM songs ORDER BY playCount DESC, lastPlayed DESC LIMIT 100")
     LiveData<List<Song>> getMostPlayedSongs();
+
+    /** Synchronous twin used when starting playback off the main thread. */
+    @Query("SELECT * FROM songs ORDER BY playCount DESC, lastPlayed DESC LIMIT 100")
+    List<Song> getMostPlayedSongsSync();
 
     @Query("SELECT DISTINCT artist FROM songs WHERE artist IS NOT NULL ORDER BY artist ASC")
     LiveData<List<String>> getAllArtists();

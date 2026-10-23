@@ -30,9 +30,29 @@ public class EqualizerManager {
     private boolean enabled = true;
     private int currentPresetIndex = 0;
 
+    private static final String PREFS = "equalizer_prefs";
+    private static final String KEY_ENABLED = "enabled";
+    private static final String KEY_PRESET = "preset_index";
+
     @Inject
     public EqualizerManager(Context context) {
         this.context = context.getApplicationContext();
+        // Restore the user's last choice so a preset survives app restarts.
+        android.content.SharedPreferences prefs =
+                context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        this.enabled = prefs.getBoolean(KEY_ENABLED, true);
+        this.currentPresetIndex = prefs.getInt(KEY_PRESET, 0);
+    }
+
+    private void persist() {
+        try {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(KEY_ENABLED, enabled)
+                    .putInt(KEY_PRESET, currentPresetIndex)
+                    .apply();
+        } catch (Exception ignored) {
+        }
     }
 
     /** Attach to the player's audio session. Re-attaches if session changes. */
@@ -41,6 +61,14 @@ public class EqualizerManager {
         try {
             equalizer = new Equalizer(0, audioSessionId);
             equalizer.setEnabled(enabled);
+            // Re-apply the persisted preset to the new audio session.
+            if (currentPresetIndex >= 0 && currentPresetIndex < getPresets().length) {
+                Preset preset = getPresets()[currentPresetIndex];
+                int bands = getNumberOfBands();
+                for (int i = 0; i < preset.bandLevels.length && i < bands; i++) {
+                    setBandLevel(i, preset.bandLevels[i]);
+                }
+            }
         } catch (Exception e) {
             equalizer = null;
         }
@@ -58,6 +86,7 @@ public class EqualizerManager {
 
     public synchronized void setEnabled(boolean enabled) {
         this.enabled = enabled;
+        persist();
         if (equalizer != null) {
             try {
                 equalizer.setEnabled(enabled);
@@ -105,16 +134,36 @@ public class EqualizerManager {
         }
     }
 
+    /** Center frequency range (Hz) of a band: {low, high}. */
+    public int[] getBandFreqRange(int band) {
+        if (equalizer == null) return new int[]{0, 0};
+        try {
+            return equalizer.getBandFreqRange((short) band);
+        } catch (Exception e) {
+            return new int[]{0, 0};
+        }
+    }
+
     public synchronized int getCurrentPresetIndex() {
         return currentPresetIndex;
     }
 
     public synchronized void applyPreset(int index) {
+        Preset[] presets = getPresets();
+        if (index < 0 || index >= presets.length) return;
         currentPresetIndex = index;
-        Preset preset = getPresets()[index];
-        for (int i = 0; i < preset.bandLevels.length; i++) {
+        persist();
+        Preset preset = presets[index];
+        int bands = getNumberOfBands();
+        for (int i = 0; i < preset.bandLevels.length && i < bands; i++) {
             setBandLevel(i, preset.bandLevels[i]);
         }
+    }
+
+    /** Marks the current tuning as custom (no matching preset) without losing it. */
+    public synchronized void markCustom() {
+        currentPresetIndex = -1;
+        persist();
     }
 
     /** Built-in preset bank applied across all supported bands. */

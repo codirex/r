@@ -19,6 +19,7 @@ import com.musicplayer.app.ui.main.adapter.GridItemAdapter;
 import com.musicplayer.app.ui.player.PlayerViewModel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,8 @@ public class ArtistsFragment extends Fragment {
     private GridItemAdapter adapter;
     private PlayerViewModel viewModel;
     private List<Song> songs = new ArrayList<>();
+    private String sortKey = "name";
+    private boolean descending = false;
 
     @Nullable
     @Override
@@ -74,6 +77,13 @@ public class ArtistsFragment extends Fragment {
         // Rebuild when the shared search query changes.
         viewModel.getSearchQuery().observe(getViewLifecycleOwner(), q -> rebuild());
 
+        // Re-sort whenever the shared sort choice changes.
+        viewModel.getSortSpec().observe(getViewLifecycleOwner(), spec -> {
+            sortKey = spec.key;
+            descending = spec.descending;
+            rebuild();
+        });
+
         return view;
     }
 
@@ -90,18 +100,57 @@ public class ArtistsFragment extends Fragment {
     }
 
     private List<GridItemAdapter.GridItem> buildArtists(List<Song> all) {
-        Map<String, Integer> counts = new LinkedHashMap<>();
+        Map<String, List<Song>> byArtist = new LinkedHashMap<>();
         for (Song song : all) {
             String artist = song.getArtist() == null ? "Unknown Artist" : song.getArtist();
-            counts.merge(artist, 1, Integer::sum);
+            List<Song> bucket = byArtist.get(artist);
+            if (bucket == null) {
+                bucket = new ArrayList<>();
+                byArtist.put(artist, bucket);
+            }
+            bucket.add(song);
         }
+
+        List<Map.Entry<String, List<Song>>> entries = new ArrayList<>(byArtist.entrySet());
+        entries.sort(artistComparator());
+
         List<GridItemAdapter.GridItem> result = new ArrayList<>();
         long id = 0;
-        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+        for (Map.Entry<String, List<Song>> entry : entries) {
             result.add(new GridItemAdapter.GridItem(id++, entry.getKey(),
-                    entry.getValue() + " tracks", null, R.drawable.bg_artist_placeholder));
+                    entry.getValue().size() + " tracks", null, R.drawable.bg_artist_placeholder));
         }
         return result;
+    }
+
+    /** Sorts artist groups by the current shared sort spec. */
+    private Comparator<Map.Entry<String, List<Song>>> artistComparator() {
+        Comparator<Map.Entry<String, List<Song>>> comparator;
+        switch (sortKey) {
+            case "tracks":
+                comparator = Comparator.comparingInt(e -> e.getValue().size());
+                break;
+            case "recent":
+                comparator = Comparator.comparingLong(this::newestDateAdded);
+                break;
+            case "name":
+            case "artist":
+            default:
+                comparator = Comparator.comparing(e -> e.getKey(), String.CASE_INSENSITIVE_ORDER);
+                break;
+        }
+        return descending ? comparator.reversed() : comparator;
+    }
+
+    private long newestDateAdded(Map.Entry<String, List<Song>> entry) {
+        long newest = 0;
+        for (Song song : entry.getValue()) {
+            try {
+                newest = Math.max(newest, Long.parseLong(song.getDateAdded()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return newest;
     }
 
     private List<Song> songsFor(String artist) {

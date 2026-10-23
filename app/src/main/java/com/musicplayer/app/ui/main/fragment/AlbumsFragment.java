@@ -19,6 +19,7 @@ import com.musicplayer.app.ui.main.adapter.GridItemAdapter;
 import com.musicplayer.app.ui.player.PlayerViewModel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,8 @@ public class AlbumsFragment extends Fragment {
     private GridItemAdapter adapter;
     private PlayerViewModel viewModel;
     private List<Song> songs = new ArrayList<>();
+    private String sortKey = "name";
+    private boolean descending = false;
 
     @Nullable
     @Override
@@ -71,6 +74,13 @@ public class AlbumsFragment extends Fragment {
         // Rebuild when the shared search query changes.
         viewModel.getSearchQuery().observe(getViewLifecycleOwner(), q -> rebuild());
 
+        // Re-sort whenever the shared sort choice changes.
+        viewModel.getSortSpec().observe(getViewLifecycleOwner(), spec -> {
+            sortKey = spec.key;
+            descending = spec.descending;
+            rebuild();
+        });
+
         return view;
     }
 
@@ -88,24 +98,73 @@ public class AlbumsFragment extends Fragment {
     }
 
     private List<GridItemAdapter.GridItem> buildAlbums(List<Song> all) {
-        Map<String, GridItemAdapter.GridItem> albums = new LinkedHashMap<>();
-        Map<String, Integer> counts = new LinkedHashMap<>();
+        Map<String, List<Song>> byAlbum = new LinkedHashMap<>();
         for (Song song : all) {
             String album = song.getAlbum() == null ? "Unknown Album" : song.getAlbum();
-            counts.merge(album, 1, Integer::sum);
-            if (!albums.containsKey(album)) {
-                String artwork = firstArtworkFor(all, album);
-                albums.put(album, new GridItemAdapter.GridItem(
-                        albums.size(), album, null, artwork, R.drawable.bg_album_placeholder));
+            List<Song> bucket = byAlbum.get(album);
+            if (bucket == null) {
+                bucket = new ArrayList<>();
+                byAlbum.put(album, bucket);
             }
+            bucket.add(song);
         }
+
+        List<Map.Entry<String, List<Song>>> entries = new ArrayList<>(byAlbum.entrySet());
+        entries.sort(albumComparator());
+
         List<GridItemAdapter.GridItem> result = new ArrayList<>();
-        for (Map.Entry<String, GridItemAdapter.GridItem> entry : albums.entrySet()) {
-            GridItemAdapter.GridItem old = entry.getValue();
-            result.add(new GridItemAdapter.GridItem(old.id, old.title,
-                    counts.get(entry.getKey()) + " tracks", old.imagePath, old.placeholderRes));
+        long id = 0;
+        for (Map.Entry<String, List<Song>> entry : entries) {
+            List<Song> albumSongs = entry.getValue();
+            result.add(new GridItemAdapter.GridItem(id++, entry.getKey(),
+                    albumSongs.size() + " tracks",
+                    firstArtworkFor(albumSongs, entry.getKey()),
+                    R.drawable.bg_album_placeholder));
         }
         return result;
+    }
+
+    /** Sorts album groups by the current shared sort spec. */
+    private Comparator<Map.Entry<String, List<Song>>> albumComparator() {
+        Comparator<Map.Entry<String, List<Song>>> comparator;
+        switch (sortKey) {
+            case "artist":
+                comparator = Comparator.comparing(
+                        e -> nullToEmpty(e.getValue().get(0).getArtist()),
+                        String.CASE_INSENSITIVE_ORDER);
+                break;
+            case "year":
+                comparator = Comparator.comparing(
+                        e -> nullToEmpty(e.getValue().get(0).getYear()),
+                        String.CASE_INSENSITIVE_ORDER);
+                break;
+            case "tracks":
+                comparator = Comparator.comparingInt(e -> e.getValue().size());
+                break;
+            case "recent":
+                comparator = Comparator.comparingLong(this::newestDateAdded);
+                break;
+            case "name":
+            default:
+                comparator = Comparator.comparing(e -> e.getKey(), String.CASE_INSENSITIVE_ORDER);
+                break;
+        }
+        return descending ? comparator.reversed() : comparator;
+    }
+
+    private long newestDateAdded(Map.Entry<String, List<Song>> entry) {
+        long newest = 0;
+        for (Song song : entry.getValue()) {
+            try {
+                newest = Math.max(newest, Long.parseLong(song.getDateAdded()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return newest;
+    }
+
+    private static String nullToEmpty(String s) {
+        return s == null ? "" : s;
     }
 
     private String firstArtworkFor(List<Song> all, String album) {

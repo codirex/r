@@ -17,6 +17,22 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <!-- Shown only when the dialog was opened from "Add to playlist". -->
+        <TextView
+            android:id="@+id/labelExisting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/existing_playlists"
+            android:textColor="?android:attr/textColorSecondary"
+            android:visibility="gone" />
+
+        <RadioGroup
+            android:id="@+id/radioExistingPlaylists"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -14,7 +14,9 @@ import com.musicplayer.app.data.model.Playlist;
 import com.musicplayer.app.data.model.Song;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -84,6 +86,10 @@ public class MusicRepository {
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
 
+        // MediaStore.Audio.Media has no genre column; genres live in the
+        // audio_genres_map table (populated from ID3 tags by MediaProvider).
+        Map<Long, String> genreByAudioId = loadGenreMap(resolver);
+
         try (Cursor cursor = resolver.query(uri, projection, selection, null, sortOrder)) {
             if (cursor == null) return songs;
             int idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
@@ -109,6 +115,9 @@ public class MusicRepository {
                 long dateAdded = dateAddedCol >= 0 ? cursor.getLong(dateAddedCol) * 1000 : 0;
                 String year = yearCol >= 0 ? String.valueOf(cursor.getInt(yearCol)) : null;
                 String genre = genreCol >= 0 ? cursor.getString(genreCol) : null;
+                if (genre == null || genre.isEmpty()) {
+                    genre = genreByAudioId.get(id);
+                }
                 String path = dataCol >= 0 ? cursor.getString(dataCol) : null;
 
                 String artwork = "content://media/external/audio/media/" + id + "/albumart";
@@ -135,6 +144,56 @@ public class MusicRepository {
                 MediaStore.Audio.Media.DATE_ADDED,
                 MediaStore.Audio.Media.YEAR,
                 MediaStore.Audio.Media.DATA};
+    }
+
+    /**
+     * Maps audio id -> genre name using MediaStore.Audio.Genres + its members table.
+     * Never throws: a missing/restricted genres table simply leaves the map empty.
+     */
+    private Map<Long, String> loadGenreMap(ContentResolver resolver) {
+        Map<Long, String> genreNames = new HashMap<>();
+        Map<Long, String> byAudioId = new HashMap<>();
+
+        try (Cursor cursor = resolver.query(
+                MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME},
+                null, null, null)) {
+            if (cursor != null) {
+                int gidCol = cursor.getColumnIndex(MediaStore.Audio.Genres._ID);
+                int nameCol = cursor.getColumnIndex(MediaStore.Audio.Genres.NAME);
+                while (cursor.moveToNext()) {
+                    if (gidCol >= 0 && nameCol >= 0) {
+                        genreNames.put(cursor.getLong(gidCol), cursor.getString(nameCol));
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            return byAudioId;
+        }
+
+        // content://media/external/audio/genres/members -> columns audio_id, genre_id
+        // (built by hand: the "members" content directory is stable across API levels)
+        Uri members = Uri.withAppendedPath(
+                MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, "members");
+        try (Cursor cursor = resolver.query(members,
+                new String[]{"audio_id", "genre_id"}, null, null, null)) {
+            if (cursor != null) {
+                int audioCol = cursor.getColumnIndex("audio_id");
+                int genreIdCol = cursor.getColumnIndex("genre_id");
+                while (cursor.moveToNext()) {
+                    if (audioCol < 0 || genreIdCol < 0) break;
+                    long audioId = cursor.getLong(audioCol);
+                    String name = genreNames.get(cursor.getLong(genreIdCol));
+                    // First genre wins when a track carries several.
+                    if (name != null && !name.isEmpty() && !byAudioId.containsKey(audioId)) {
+                        byAudioId.put(audioId, name);
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            // Query unavailable on this device; genres stay null and the tab shows "Unknown".
+        }
+        return byAudioId;
     }
 
     /** Deletes rows from Room for tracks that no longer exist in MediaStore. */

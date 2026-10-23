@@ -1,13 +1,21 @@
 package com.musicplayer.app.ui.main.fragment;
 
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,13 +23,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.musicplayer.app.R;
+import com.musicplayer.app.data.model.Playlist;
+import com.musicplayer.app.data.model.PlaylistSong;
 import com.musicplayer.app.data.model.Song;
+import com.musicplayer.app.data.repository.MusicRepository;
 import com.musicplayer.app.data.repository.SyncScheduler;
-import com.musicplayer.app.ui.dialog.SortDialogFragment;
 import com.musicplayer.app.ui.dialog.TrackDetailsSheetDialogFragment;
 import com.musicplayer.app.ui.main.adapter.TrackAdapter;
 import com.musicplayer.app.ui.player.PlayerViewModel;
+import com.musicplayer.app.ui.playlist.CreatePlaylistDialogFragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,17 +50,26 @@ import dagger.hilt.android.AndroidEntryPoint;
  */
 @AndroidEntryPoint
 public class TracksFragment extends Fragment
-        implements SortDialogFragment.OnSortChosen {
+        implements CreatePlaylistDialogFragment.OnPlaylistCreated {
 
     @Inject
     SyncScheduler syncScheduler;
+
+    @Inject
+    MusicRepository repository;
 
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefresh;
     private TrackAdapter adapter;
     private PlayerViewModel viewModel;
 
+    private LinearLayout selectionBar;
+    private TextView tvSelectionCount;
+    private OnBackPressedCallback selectionBackPressed;
+    private List<Song> pendingPlaylistSongs = new ArrayList<>();
+
     private List<Song> allSongs = new ArrayList<>();
+    private List<Song> visibleSongs = new ArrayList<>();
     private String sortKey = "name";
     private boolean descending = false;
 
@@ -91,6 +112,39 @@ public class TracksFragment extends Fragment
             swipeRefresh.setRefreshing(false);
         });
 
+        // ---- Selection mode (entered from the details sheet's "Select") ----
+        selectionBar = view.findViewById(R.id.selectionBar);
+        tvSelectionCount = view.findViewById(R.id.tvSelectionCount);
+        view.findViewById(R.id.btnSelectionClose).setOnClickListener(v -> exitSelection());
+        view.findViewById(R.id.btnSelectionAll).setOnClickListener(v -> adapter.selectAll());
+        view.findViewById(R.id.btnSelectionAdd).setOnClickListener(v -> addToPlaylistSelected());
+        view.findViewById(R.id.btnSelectionShare).setOnClickListener(v -> shareSelected());
+        view.findViewById(R.id.btnSelectionDelete).setOnClickListener(v -> deleteSelected());
+
+        adapter.setOnSelectionChangedListener(count -> {
+            if (tvSelectionCount != null) {
+                tvSelectionCount.setText(getString(R.string.selected_count, count));
+            }
+        });
+
+        // Back exits selection mode instead of closing the app.
+        selectionBackPressed = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                exitSelection();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher()
+                .addCallback(getViewLifecycleOwner(), selectionBackPressed);
+
+        // One-shot request from the track details sheet.
+        viewModel.getSelectRequest().observe(getViewLifecycleOwner(), song -> {
+            if (song != null) {
+                enterSelection(song);
+                viewModel.clearSelectRequest();
+            }
+        });
+
         viewModel.getCurrentSong().observe(getViewLifecycleOwner(), song ->
                 adapter.setCurrentPlayingId(song == null ? -1 : song.getId()));
 
@@ -101,6 +155,13 @@ public class TracksFragment extends Fragment
 
         // Re-filter whenever the search text changes.
         viewModel.getSearchQuery().observe(getViewLifecycleOwner(), q -> applySort());
+
+        // Re-sort whenever the shared sort choice changes.
+        viewModel.getSortSpec().observe(getViewLifecycleOwner(), spec -> {
+            sortKey = spec.key;
+            descending = spec.descending;
+            applySort();
+        });
 
         return view;
     }
@@ -147,14 +208,109 @@ public class TracksFragment extends Fragment
             comparator = comparator.reversed();
         }
         Collections.sort(sorted, comparator);
+        visibleSongs = sorted;
         adapter.setSongs(sorted);
     }
 
+    // ---- Selection mode ----
+
+    private void enterSelection(Song song) {
+        if (!adapter.isSelectionMode()) {
+            adapter.setSelectionMode(true);
+            selectionBar.setVisibility(View.VISIBLE);
+            selectionBackPressed.setEnabled(true);
+        }
+        adapter.setSelected(song.getId());
+        if (recyclerView != null) {
+            int index = indexOf(visibleSongs, song);
+            if (index >= 0) recyclerView.scrollToPosition(index);
+        }
+    }
+
+    private void exitSelection() {
+        if (!adapter.isSelectionMode()) return;
+        adapter.setSelectionMode(false);
+        selectionBar.setVisibility(View.GONE);
+        selectionBackPressed.setEnabled(false);
+    }
+
+    private void addToPlaylistSelected() {
+        pendingPlaylistSongs = adapter.getSelectedSongs();
+        if (pendingPlaylistSongs.isEmpty()) {
+            Toast.makeText(getContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        CreatePlaylistDialogFragment.newInstance()
+                .show(getChildFragmentManager(), "add_selection");
+    }
+
+    private void shareSelected() {
+        List<Song> selected = adapter.getSelectedSongs();
+        if (selected.isEmpty()) {
+            Toast.makeText(getContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            ArrayList<Uri> uris = new ArrayList<>();
+            for (Song song : selected) {
+                File file = new File(song.getPath());
+                if (!file.exists()) continue;
+                uris.add(FileProvider.getUriForFile(requireContext(),
+                        requireContext().getPackageName() + ".fileprovider", file));
+            }
+            if (uris.isEmpty()) {
+                Toast.makeText(getContext(), R.string.action_share, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent share = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            share.setType("audio/*");
+            share.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, getString(R.string.action_share)));
+        } catch (Exception e) {
+            Toast.makeText(getContext(), R.string.action_share, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void deleteSelected() {
+        final List<Song> selected = adapter.getSelectedSongs();
+        if (selected.isEmpty()) {
+            Toast.makeText(getContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final ContentResolver resolver = requireContext().getContentResolver();
+        new Thread(() -> {
+            for (Song song : selected) {
+                try {
+                    resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            MediaStore.Audio.Media._ID + "=?",
+                            new String[]{String.valueOf(song.getId())});
+                } catch (Exception ignored) {
+                    // Removal keeps going; the sync observer reconciles Room.
+                }
+            }
+        }).start();
+        exitSelection();
+        Toast.makeText(getContext(), R.string.action_delete, Toast.LENGTH_SHORT).show();
+    }
+
+    /** Adds every selected track to the playlist that was just created. */
     @Override
-    public void onSortChosen(String sortKey, boolean descending) {
-        this.sortKey = sortKey;
-        this.descending = descending;
-        applySort();
+    public void onPlaylistCreated(Playlist playlist) {
+        final List<Song> toAdd = pendingPlaylistSongs;
+        pendingPlaylistSongs = new ArrayList<>();
+        if (toAdd.isEmpty()) return;
+
+        new Thread(() -> {
+            int position = repository.playlists().getSongCount(playlist.getId());
+            for (Song song : toAdd) {
+                repository.playlists().addSongToPlaylist(
+                        new PlaylistSong(playlist.getId(), song.getId(), position++));
+            }
+        }).start();
+
+        exitSelection();
+        Toast.makeText(getContext(), R.string.action_add_to_playlist, Toast.LENGTH_SHORT).show();
     }
 
     private static String nullToEmpty(String s) {

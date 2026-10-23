@@ -202,14 +202,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSortChosen(String sortKey, boolean descending) {
-        // Deliver the result to the currently visible tab when it accepts sorting.
-        androidx.fragment.app.Fragment f = getSupportFragmentManager()
-                .findFragmentByTag("f" + viewPager.getCurrentItem());
-        if (f instanceof SortDialogFragment.OnSortChosen) {
-            ((SortDialogFragment.OnSortChosen) f).onSortChosen(sortKey, descending);
-        } else {
-            Toast.makeText(this, sortKey, Toast.LENGTH_SHORT).show();
-        }
+        // One shared sort spec: every tab observes it and re-orders its own content.
+        new androidx.lifecycle.ViewModelProvider(this)
+                .get(com.musicplayer.app.ui.player.PlayerViewModel.class)
+                .setSortSpec(sortKey, descending);
     }
 
     // ---- TrackDetailsSheetDialogFragment.SheetActions ----
@@ -232,7 +228,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onAddToPlaylist(Song song) {
         pendingPlaylistSong = song;
-        CreatePlaylistDialogFragment.newInstance()
+        // Pick an existing playlist or create a new one in the same dialog.
+        CreatePlaylistDialogFragment.newInstanceForPick()
                 .show(getSupportFragmentManager(), "add_to_playlist");
     }
 
@@ -332,8 +329,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSelect(Song song) {
-        // Selection mode: closes when the user presses Back (onBackPressed default).
-        Toast.makeText(this, R.string.action_select, Toast.LENGTH_SHORT).show();
+        // Jump to the Tracks tab and enter multi-select with this track pre-checked.
+        bottomNavigationView.setSelectedItemId(R.id.nav_tracks);
+        new androidx.lifecycle.ViewModelProvider(this)
+                .get(com.musicplayer.app.ui.player.PlayerViewModel.class)
+                .requestSelect(song);
     }
 
     @Override

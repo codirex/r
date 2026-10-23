@@ -43,6 +43,10 @@ public interface PlaylistDao {
     @Query("SELECT songs.* FROM songs INNER JOIN playlist_songs ON songs.id = playlist_songs.songId WHERE playlist_songs.playlistId = :playlistId ORDER BY playlist_songs.position ASC")
     LiveData<List<Song>> getSongsInPlaylist(long playlistId);
 
+    /** Synchronous twin used to start playback from a background thread. */
+    @Query("SELECT songs.* FROM songs INNER JOIN playlist_songs ON songs.id = playlist_songs.songId WHERE playlist_songs.playlistId = :playlistId ORDER BY playlist_songs.position ASC")
+    List<Song> getSongsInPlaylistSync(long playlistId);
+
     @Query("SELECT * FROM playlists WHERE name = 'All Songs'")
     Playlist getAllSongsPlaylist();
 

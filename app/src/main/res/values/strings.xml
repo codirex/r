@@ -18,6 +18,9 @@
     <string name="sleep_timer">Sleep timer</string>
     <string name="lyrics">Lyrics</string>
     <string name="equalizer">Equalizer</string>
+    <string name="equalizer_enabled">Enable equalizer</string>
+    <string name="equalizer_presets">Presets</string>
+    <string name="equalizer_bands">Bands</string>
     <string name="queue">Queue</string>
     <string name="back">Back</string>
     <string name="close">Close</string>
@@ -73,6 +76,9 @@
     <string name="action_share">Share</string>
     <string name="action_delete">Delete</string>
     <string name="action_select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="selected_count">%1$d selected</string>
+    <string name="nothing_selected">No tracks selected</string>
 
     <!-- Edit track -->
     <string name="edit_track_title">Edit track</string>
@@ -88,6 +94,8 @@
     <string name="create_playlist">Create playlist</string>
     <string name="edit_playlist">Edit playlist</string>
     <string name="playlist_name">Playlist name</string>
+    <string name="playlist_empty">This playlist is empty</string>
+    <string name="existing_playlists">Existing playlists</string>
     <string name="mood">Mood</string>
     <string name="mood_happy">Happy</string>
     <string name="mood_chill">Chill</string>

@@ -153,7 +153,8 @@ public class FullPlayerActivity extends AppCompatActivity {
         });
 
         btnEqualizer.setOnClickListener(v ->
-                Toast.makeText(this, R.string.equalizer, Toast.LENGTH_SHORT).show());
+                new com.musicplayer.app.ui.dialog.EqualizerDialogFragment()
+                        .show(getSupportFragmentManager(), "equalizer"));
 
         arcSlider.setOnSeekListener(new ArcSliderView.OnSeekListener() {
             @Override
